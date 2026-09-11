@@ -15,7 +15,8 @@ interface Props {
   onSelectDay: (day: number) => void;
 }
 
-const lightTiles = 'https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png';
+const cartoKey = (import.meta.env.VITE_CARTO_API_KEY as string | undefined) || 'cb1_3gqo_2_43e895b036e140d9ca923985';
+const lightTiles = `https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png?api_key=${cartoKey}`;
 
 function pinIcon(num: number, optimized: boolean) {
   return L.divIcon({
