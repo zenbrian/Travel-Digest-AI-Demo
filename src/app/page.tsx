@@ -1,4 +1,4 @@
-import { Calendar, LayoutGrid, Map, Moon, RotateCcw, Sun } from 'lucide-react';
+import { Calendar, LayoutGrid, Map, RotateCcw } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import DemoMap from '../components/demo-map';
 import FloatingAgent from '../components/floating-agent';
@@ -18,26 +18,18 @@ export default function Page() {
     { id: 'hello', sender: 'assistant', text: '你好！我是 Travel Digest AI。告訴我你的旅行偏好，我會協助整理行程、路線與每日安排。', timestamp: '10:00' }
   ]);
   const [isTyping, setIsTyping] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(true);
   const [activeNavTab, setActiveNavTab] = useState('itinerary');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [selectedStop, setSelectedStop] = useState<ItineraryStop | null>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem('DEMO_THEME');
-    const dark = saved ? saved === 'dark' : true;
-    setIsDarkMode(dark);
-    document.documentElement.classList.toggle('dark', dark);
+    document.documentElement.classList.remove('dark');
+    try {
+      localStorage.removeItem('DEMO_THEME');
+    } catch {}
   }, []);
 
   const tripStopsCount = useMemo(() => demoState.trip.days.reduce((sum, day) => sum + day.stops.length, 0), [demoState.trip]);
-
-  const toggleTheme = () => {
-    const next = !isDarkMode;
-    setIsDarkMode(next);
-    localStorage.setItem('DEMO_THEME', next ? 'dark' : 'light');
-    document.documentElement.classList.toggle('dark', next);
-  };
 
   const runAct = (act: DemoAct) => {
     const prompt = demoPrompts.find((p) => p.act === act);
@@ -86,8 +78,7 @@ export default function Page() {
               <button onClick={() => setDemoState((prev) => ({ ...prev, viewMode: 'kanban' }))} className={`inline-flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-bold transition-all ${demoState.viewMode === 'kanban' ? 'bg-white text-zinc-950 shadow-sm dark:bg-zinc-950 dark:text-white' : 'text-zinc-500 dark:text-zinc-400'}`}><LayoutGrid className="size-4" />行程看板</button>
               <button onClick={() => setDemoState((prev) => ({ ...prev, viewMode: 'map' }))} className={`inline-flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-bold transition-all ${demoState.viewMode === 'map' ? 'bg-white text-zinc-950 shadow-sm dark:bg-zinc-950 dark:text-white' : 'text-zinc-500 dark:text-zinc-400'}`}><Map className="size-4" />每日細節地圖</button>
             </div>
-            <button onClick={toggleTheme} className="grid size-10 place-items-center rounded-2xl border border-zinc-200 bg-white text-zinc-500 transition hover:text-zinc-950 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400 dark:hover:text-white">{isDarkMode ? <Sun className="size-4" /> : <Moon className="size-4" />}</button>
-            <button onClick={reset} className="inline-flex items-center gap-2 rounded-2xl border border-zinc-200 bg-white px-4 py-2.5 text-xs font-bold text-zinc-600 transition hover:text-zinc-950 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300 dark:hover:text-white"><RotateCcw className="size-4" />一鍵重置</button>
+            <button onClick={reset} className="inline-flex items-center gap-2 rounded-2xl border border-zinc-200 bg-white px-4 py-2.5 text-xs font-bold text-zinc-600 transition hover:text-zinc-950 shadow-xs"><RotateCcw className="size-4" />一鍵重置</button>
           </div>
         </header>
 

@@ -15,7 +15,6 @@ interface Props {
   onSelectDay: (day: number) => void;
 }
 
-const darkTiles = 'https://{s}.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}.png';
 const lightTiles = 'https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png';
 
 function pinIcon(num: number, optimized: boolean) {
@@ -141,8 +140,6 @@ export default function DemoMap({ trip, selectedDay, highlight = {}, selectedRou
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<L.Map | null>(null);
   const layerGroup = useRef<L.LayerGroup | null>(null);
-  const [isDark, setIsDark] = useState(true);
-
   const activeDay = useMemo(() => trip.days.find((d) => d.dayIndex === selectedDay) ?? trip.days[0], [trip, selectedDay]);
   const originalComparisonDay = useMemo(() => itineraryOriginTrip.days.find((day) => day.dayIndex === selectedDay), [selectedDay]);
   const stops = activeDay?.stops ?? [];
@@ -151,16 +148,14 @@ export default function DemoMap({ trip, selectedDay, highlight = {}, selectedRou
   const dayDuration = useMemo(() => activeDay?.transits.reduce((sum, transit) => sum + (transit.durationValue ?? 0), 0) ?? 0, [activeDay]);
 
   useEffect(() => {
-    const sync = () => setIsDark(document.documentElement.classList.contains('dark'));
-    sync();
-    const observer = new MutationObserver(sync);
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
     if (!mapRef.current || mapInstance.current) return;
     const map = L.map(mapRef.current, { zoomControl: true, attributionControl: false, scrollWheelZoom: true }).setView([34.68, 135.50], 12);
+    L.tileLayer(lightTiles, {
+      subdomains: 'abcd',
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+    }).addTo(map);
+
     mapInstance.current = map;
     layerGroup.current = L.layerGroup().addTo(map);
     setTimeout(() => map.invalidateSize(), 80);
@@ -170,19 +165,6 @@ export default function DemoMap({ trip, selectedDay, highlight = {}, selectedRou
       layerGroup.current = null;
     };
   }, []);
-
-  useEffect(() => {
-    const map = mapInstance.current;
-    if (!map) return;
-    map.eachLayer((layer) => {
-      if (layer instanceof L.TileLayer) map.removeLayer(layer);
-    });
-    L.tileLayer(isDark ? darkTiles : lightTiles, {
-      subdomains: 'abcd',
-      maxZoom: 19,
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-    }).addTo(map);
-  }, [isDark]);
 
   useEffect(() => {
     const map = mapInstance.current;
