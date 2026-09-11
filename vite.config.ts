@@ -30,7 +30,8 @@ function cartoTileProxy(): Plugin {
           const upstream = `https://basemaps.cartocdn.com/rastertiles/${style}/${z}/${x}/${y}.png?key=${encodeURIComponent(key)}`;
           const upstreamRes = await fetch(upstream, {
             headers: {
-              'user-agent': 'TravelDigestAI-Demo/1.0'
+              'user-agent': 'TravelDigestAI-Demo/1.0',
+              'referer': 'https://zenbrian.github.io/'
             }
           });
 
@@ -76,7 +77,8 @@ function cartoTileProxy(): Plugin {
           const upstream = `https://basemaps.cartocdn.com/rastertiles/${style}/${z}/${x}/${y}.png?key=${encodeURIComponent(key)}`;
           const upstreamRes = await fetch(upstream, {
             headers: {
-              'user-agent': 'TravelDigestAI-Demo/1.0'
+              'user-agent': 'TravelDigestAI-Demo/1.0',
+              'referer': 'https://zenbrian.github.io/'
             }
           });
 
